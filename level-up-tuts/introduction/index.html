@@ -10,8 +10,15 @@
 	<body>
 		<div id="area"></div>
 		<script type="text/babel">
+			var HelloWorld = React.createClass({
+				render: function() {
+					return (
+						<h1>Hello World</h1>
+					)
+				}
+			});	
 			ReactDOM.render(
-				<h1>Hello</h1>,
+				<HelloWorld />,
 				document.getElementById('area')
 			);
 		</script>
