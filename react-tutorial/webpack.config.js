@@ -11,7 +11,11 @@ module.exports = {
 			loader: 'babel',
 			query: {
 				presets: ['es2015', 'react']
-			}
+			},
+		},
+		{ 
+			test: /\.json$/, 
+			loader: "json-loader" 
 		}]
 	}
 };
