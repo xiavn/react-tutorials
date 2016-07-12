@@ -2,25 +2,33 @@ import React from "react";
 import {render} from "react-dom";
 import MarkdownIt from "markdown-it";
 
-let comments = [
-	{
-		id: 1,
-		author: "Adam Adams",
-		text: "This is one comment"
-	},
-	{
-		id: 2,
-		author: "Ben Benjamin",
-		text: "This is *another* comment"
-	}
-];
-
 class CommentBox extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+			comments: []
+		};
+	}
+
+	componentDidMount() {
+		$.ajax({
+			url: this.props.url,
+			dataType: 'json',
+			cache: false,
+			success: function(data) {
+				this.setState({comments: data})
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+			}.bind(this)
+		});
+	}
+
 	render() {
 		return (
 			<div className="commentBox">
 				<h1>Comments</h1>
-				<CommentList comments={this.props.comments} />
+				<CommentList comments={this.state.comments} />
 				<CommentForm />
 			</div>
 		);
@@ -57,8 +65,8 @@ class CommentForm extends React.Component {
 
 class Comment extends React.Component {
 	rawMarkup() {
-		var md = new MarkdownIt();
-		var rawMarkup = md.render(this.props.children.toString());
+		const md = new MarkdownIt();
+		const rawMarkup = md.render(this.props.children.toString());
 		return { __html: rawMarkup };
 	}
 
@@ -74,4 +82,4 @@ class Comment extends React.Component {
 	}
 }
 
-render(<CommentBox comments={comments} />, document.getElementById("app"));
+render(<CommentBox url="src/comments.json" />, document.getElementById("app"));
