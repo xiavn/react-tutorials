@@ -10,13 +10,13 @@ class CommentBox extends React.Component {
 		};
 	}
 
-	componentDidMount() {
+	loadCommentsFromServer() {
 		$.ajax({
 			url: this.props.url,
-			dataType: 'json',
+			dataType: "json",
 			cache: false,
 			success: function(data) {
-				this.setState({comments: data})
+				this.setState({comments: data});
 			}.bind(this),
 			error: function(xhr, status, err) {
 				console.error(this.props.url, status, err.toString());
@@ -24,12 +24,32 @@ class CommentBox extends React.Component {
 		});
 	}
 
+	handleCommentSubmit(comment) {
+		$.ajax({
+			url: this.props.url,
+			dataType: "json",
+			type: "POST",
+			data: comment,
+			success: function(data) {
+				this.setState({comments: data});
+			}.bind(this),
+			error: function(xhr, status, err) {
+				console.error(this.props.url, status, err.toString());
+			}.bind(this)
+		});
+	}
+
+	componentDidMount() {
+		this.loadCommentsFromServer();
+		setInterval(this.loadCommentsFromServer.bind(this), this.props.pollInterval);
+	}
+
 	render() {
 		return (
 			<div className="commentBox">
 				<h1>Comments</h1>
 				<CommentList comments={this.state.comments} />
-				<CommentForm />
+				<CommentForm onCommentSubmit={this.handleCommentSubmit.bind(this)} />
 			</div>
 		);
 	}
@@ -54,11 +74,50 @@ class CommentList extends React.Component {
 }
 
 class CommentForm extends React.Component {
+	constructor() {
+		super();
+		this.state = {
+			author: "",
+			text: ""
+		};
+	}
+
+	handleAuthorChange(e) {
+		this.setState({author: e.target.value});
+	}
+
+	handleTextChange(e) {
+		this.setState({text: e.target.value});
+	}
+
+	handleSubmit(e) {
+		e.preventDefault();
+		let author = this.state.author.trim();
+		let text = this.state.text.trim();
+		if (!text || !author) {
+			return;
+		}
+		this.props.onCommentSubmit({author: author, text: text});
+		this.setState({author: "", text: ""});
+	}
+
 	render() {
 		return (
-			<div className="commentForm">
-				I'm a CommentForm!
-			</div>
+			<form className="commentForm" onSubmit={this.handleSubmit.bind(this)}>
+				<input 
+					type="text" 
+					placeholder="Your Name" 
+					value={this.state.author} 
+					onChange={this.handleAuthorChange.bind(this)}
+				/>
+				<input 
+					type="text" 
+					placeholder="Say something..." 
+					value={this.state.text} 
+					onChange={this.handleTextChange.bind(this)}
+				/>
+				<input type="submit" value="Post" />
+			</form>
 		);
 	}
 }
@@ -82,4 +141,4 @@ class Comment extends React.Component {
 	}
 }
 
-render(<CommentBox url="src/comments.json" />, document.getElementById("app"));
+render(<CommentBox url="src/comments.json" pollInterval={2000} />, document.getElementById("app"));

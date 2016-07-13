@@ -8,5 +8,10 @@
 		"id": 2,
 		"author": "Ben Benjamin",
 		"text": "This is *another* comment"
+	},
+	{
+		"id": 3,
+		"author": "Carl Carling",
+		"text": "This is a further comment"
 	}
 ]
