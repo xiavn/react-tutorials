@@ -2,46 +2,34 @@ import React from "react";
 import {render} from "react-dom";
 import MarkdownIt from "markdown-it";
 
+let comments = [
+	{
+		id: 1,
+		author: "Adam Adams",
+		text: "This is one comment"
+	},
+	{
+		id: 2,
+		author: "Ben Benjamin",
+		text: "This is *another* comment"
+	},
+	{
+		id: 3,
+		author: "Carl Carling",
+		text: "This is a further comment"
+	}
+];
+
 class CommentBox extends React.Component {
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = {
-			comments: []
+			comments: props.comments
 		};
 	}
 
-	loadCommentsFromServer() {
-		$.ajax({
-			url: this.props.url,
-			dataType: "json",
-			cache: false,
-			success: function(data) {
-				this.setState({comments: data});
-			}.bind(this),
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			}.bind(this)
-		});
-	}
-
-	handleCommentSubmit(comment) {
-		$.ajax({
-			url: this.props.url,
-			dataType: "json",
-			type: "POST",
-			data: comment,
-			success: function(data) {
-				this.setState({comments: data});
-			}.bind(this),
-			error: function(xhr, status, err) {
-				console.error(this.props.url, status, err.toString());
-			}.bind(this)
-		});
-	}
-
-	componentDidMount() {
-		this.loadCommentsFromServer();
-		setInterval(this.loadCommentsFromServer.bind(this), this.props.pollInterval);
+	handleCommentSubmit() {
+		//TODO: Save comment submissions into the comments state.
 	}
 
 	render() {
@@ -49,7 +37,7 @@ class CommentBox extends React.Component {
 			<div className="commentBox">
 				<h1>Comments</h1>
 				<CommentList comments={this.state.comments} />
-				<CommentForm onCommentSubmit={this.handleCommentSubmit.bind(this)} />
+				<CommentForm onCommentSubmit = {this.handleCommentSubmit} />
 			</div>
 		);
 	}
@@ -85,7 +73,6 @@ class CommentForm extends React.Component {
 	handleAuthorChange(e) {
 		this.setState({author: e.target.value});
 	}
-
 	handleTextChange(e) {
 		this.setState({text: e.target.value});
 	}
@@ -94,27 +81,27 @@ class CommentForm extends React.Component {
 		e.preventDefault();
 		let author = this.state.author.trim();
 		let text = this.state.text.trim();
-		if (!text || !author) {
+		if (!text | !author) {
 			return;
 		}
-		this.props.onCommentSubmit({author: author, text: text});
+		this.props.onCommentSubmit({author: author, text: text})
 		this.setState({author: "", text: ""});
 	}
 
 	render() {
 		return (
-			<form className="commentForm" onSubmit={this.handleSubmit.bind(this)}>
+			<form className="commentForm" onSubmit={this.handleSubmit.bind(this)>
 				<input 
 					type="text" 
 					placeholder="Your Name" 
 					value={this.state.author} 
-					onChange={this.handleAuthorChange.bind(this)}
+					onChange={this.handleAuthorChange.bind(this)} 
 				/>
 				<input 
 					type="text" 
 					placeholder="Say something..." 
 					value={this.state.text} 
-					onChange={this.handleTextChange.bind(this)}
+					onChange={this.handleTextChange.bind(this)} 
 				/>
 				<input type="submit" value="Post" />
 			</form>
@@ -141,4 +128,4 @@ class Comment extends React.Component {
 	}
 }
 
-render(<CommentBox url="src/comments.json" pollInterval={2000} />, document.getElementById("app"));
+render(<CommentBox comments={comments} />, document.getElementById("app"));
