@@ -28,8 +28,13 @@ class CommentBox extends React.Component {
 		};
 	}
 
-	handleCommentSubmit() {
-		//TODO: Save comment submissions into the comments state.
+	handleCommentSubmit(comment) {
+		let author = comment.author;
+		let text = comment.text;
+		let id = Math.floor((Math.random() * 100) + 1);
+		this.setState({
+			comments: this.state.comments.concat({id, author, text})
+		});
 	}
 
 	render() {
@@ -37,7 +42,7 @@ class CommentBox extends React.Component {
 			<div className="commentBox">
 				<h1>Comments</h1>
 				<CommentList comments={this.state.comments} />
-				<CommentForm onCommentSubmit = {this.handleCommentSubmit} />
+				<CommentForm onCommentSubmit = {this.handleCommentSubmit.bind(this)} />
 			</div>
 		);
 	}
@@ -84,13 +89,13 @@ class CommentForm extends React.Component {
 		if (!text | !author) {
 			return;
 		}
-		this.props.onCommentSubmit({author: author, text: text})
+		this.props.onCommentSubmit({author: author, text: text});
 		this.setState({author: "", text: ""});
 	}
 
 	render() {
 		return (
-			<form className="commentForm" onSubmit={this.handleSubmit.bind(this)>
+			<form className="commentForm" onSubmit={this.handleSubmit.bind(this)}>
 				<input 
 					type="text" 
 					placeholder="Your Name" 
